@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initScrollAnimations();
     initCounters();
     initCursorFollower();
-    // initParticles(); // Désactivé
+    initParallax();
     initSmoothScroll();
     initForms();
     initMobileMenu();
@@ -42,7 +42,11 @@ function initNavbar() {
    PARALLAX EFFECTS
    ============================================ */
 function initParallax() {
-    const parallaxElements = document.querySelectorAll('.hero-parallax-bg, .stats-parallax, .teach-parallax-bg, .festival-parallax');
+    const parallaxBg = document.querySelector('.hero-parallax-bg');
+    const statsParallax = document.querySelector('.stats-parallax');
+    const festivalParallax = document.querySelector('.festival-parallax');
+    const heroImage = document.querySelector('.student-img');
+    const heroText = document.querySelector('.hero-text');
     
     // Throttle scroll events
     let ticking = false;
@@ -60,30 +64,57 @@ function initParallax() {
     function updateParallax() {
         const scrolled = window.pageYOffset;
         
-        parallaxElements.forEach(element => {
-            const section = element.parentElement;
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.offsetHeight;
-            
-            // Only animate when section is in view
-            if (scrolled + window.innerHeight > sectionTop && scrolled < sectionTop + sectionHeight) {
-                const relativeScroll = scrolled - sectionTop;
-                const speed = 0.3;
-                element.style.transform = `translateY(${relativeScroll * speed}px)`;
-            }
-        });
-        
-        // Hero image parallax
-        const heroImage = document.querySelector('.student-img');
-        if (heroImage && window.pageYOffset < window.innerHeight) {
-            heroImage.style.transform = `translateY(${window.pageYOffset * 0.1}px)`;
+        // Hero background - moves slower (creates depth)
+        if (parallaxBg) {
+            parallaxBg.style.transform = `translateY(${scrolled * 0.5}px) scale(1.1)`;
         }
         
-        // Floating cards parallax
-        const floatingCards = document.querySelectorAll('.floating-card');
-        floatingCards.forEach((card, index) => {
-            const speed = 0.05 * (index + 1);
-            card.style.transform = `translateY(${Math.sin(Date.now() / 1000 + index) * 10}px)`;
+        // Hero image - moves up slightly faster
+        if (heroImage && scrolled < window.innerHeight) {
+            heroImage.style.transform = `translateY(${scrolled * 0.15}px)`;
+        }
+        
+        // Hero text - moves even slower for depth
+        if (heroText && scrolled < window.innerHeight) {
+            heroText.style.transform = `translateY(${scrolled * 0.08}px)`;
+            heroText.style.opacity = 1 - (scrolled / window.innerHeight) * 0.5;
+        }
+        
+        // Stats section parallax
+        if (statsParallax) {
+            const statsSection = statsParallax.parentElement;
+            const statsTop = statsSection.offsetTop;
+            if (scrolled + window.innerHeight > statsTop) {
+                const relativeScroll = scrolled - statsTop + window.innerHeight;
+                statsParallax.style.transform = `translateY(${relativeScroll * 0.2}px)`;
+            }
+        }
+        
+        // Festival parallax
+        if (festivalParallax) {
+            const festivalSection = festivalParallax.parentElement;
+            const festivalTop = festivalSection.offsetTop;
+            if (scrolled + window.innerHeight > festivalTop) {
+                const relativeScroll = scrolled - festivalTop + window.innerHeight;
+                festivalParallax.style.transform = `translateY(${relativeScroll * 0.15}px)`;
+            }
+        }
+    }
+    
+    // Mouse parallax on hero
+    const hero = document.querySelector('.hero');
+    if (hero) {
+        hero.addEventListener('mousemove', (e) => {
+            const mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            const mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+            
+            if (parallaxBg) {
+                parallaxBg.style.transform = `translate(${mouseX * 20}px, ${mouseY * 20 + window.pageYOffset * 0.5}px) scale(1.1)`;
+            }
+            
+            if (heroImage) {
+                heroImage.style.transform = `translate(${mouseX * -10}px, ${mouseY * -10 + window.pageYOffset * 0.15}px)`;
+            }
         });
     }
 }
