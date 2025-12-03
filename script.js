@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initScrollAnimations();
     initCounters();
     initCursorFollower();
-    initParticles();
+    // initParticles(); // Désactivé
     initSmoothScroll();
     initForms();
     initMobileMenu();
